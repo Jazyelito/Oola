@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <!-- Guardián de compatibilidad: Redirige a navegadores antiguos -->
+    <script>
+        (function () {
+            var isModern = (typeof window.fetch !== 'undefined') && (typeof window.CSS !== 'undefined');
+            if (!isModern) {
+                window.location.replace('Oolalight.html');
+            }
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oola</title>
+    <!-- Se agrega la fuente Inter desde Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Tema elegante oscuro con toques brillantes */
+            --bg-color: #0b0d14;
+            /* Oscuro sobrio */
+            --text-color: #e0e6ed;
+            --accent-color: #00d2ff;
+            /* Toque brillante cyan */
+            --accent-glow: rgba(0, 210, 255, 0.4);
+            --watermark-color: rgba(255, 255, 255, 0.02);
+            --watermark-accent: rgba(0, 210, 255, 0.015);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            /* Evita scroll mientras el intro está activo */
+        }
+
+        /* Capa del Intro */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #121622 0%, var(--bg-color) 70%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
+            cursor: pointer;
+        }
+
+        #intro-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Marca de Agua en Movimiento */
+        .watermark-container {
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            z-index: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-content: center;
+            transform: rotate(-20deg);
+            animation: moveWatermark 120s linear infinite;
+        }
+
+        @keyframes moveWatermark {
+            0% {
+                transform: rotate(-20deg) translate(0, 0);
+            }
+
+            100% {
+                transform: rotate(-20deg) translate(-15%, -15%);
+            }
+        }
+
+        .watermark-row {
+            display: flex;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .watermark-row:nth-child(odd) {
+            animation: slideLeft 100s linear infinite;
+        }
+
+        .watermark-row:nth-child(even) {
+            animation: slideRight 100s linear infinite;
+        }
+
+        @keyframes slideLeft {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-20%);
+            }
+        }
+
+        @keyframes slideRight {
+            0% {
+                transform: translateX(-20%);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .watermark-text {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--watermark-color);
+            white-space: pre;
+            margin: 15px 0;
+            user-select: none;
+            letter-spacing: 0.05em;
+        }
+
+        .watermark-text:nth-child(even) {
+            color: var(--watermark-accent);
+        }
+
+        /* Contenido Principal del Intro */
+        .intro-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Imagotipo (Placeholder Elegante en SVG) */
+        .imagotype {
+            width: 90px;
+            height: 90px;
+            margin-bottom: 30px;
+            animation: float 5s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px var(--accent-glow));
+            opacity: 0;
+            animation: fadeInImagotype 2s ease-out 0.5s forwards, float 5s ease-in-out 2.5s infinite;
+        }
+
+        @keyframes fadeInImagotype {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* Animación de las Letras "Oola" */
+        .logo-container {
+            font-size: 6rem;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            display: flex;
+            color: #ffffff;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-letter {
+            opacity: 0;
+            transform: translateY(30px) scale(0.8) rotateX(45deg);
+            filter: blur(10px);
+            /* La animación se asigna por JS para los delays aleatorios */
+            animation-name: revealLetter;
+            animation-duration: 1.2s;
+            animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation-fill-mode: forwards;
+        }
+
+        /* Destacar algunas letras sutilmente */
+        .logo-letter.highlight {
+            color: var(--accent-color);
+            font-weight: 700;
+            text-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        @keyframes revealLetter {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotateX(0deg);
+                filter: blur(0);
+            }
+        }
+
+        /* Llamado a la Acción (Texto inferior) */
+        .call-to-action {
+            position: absolute;
+            bottom: 50px;
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.5);
+            animation: pulseCTA 2.5s infinite;
+            text-transform: uppercase;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        @keyframes pulseCTA {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(0.98);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+        }
+
+        /* Contenido de Prueba (La app detrás) */
+        #app-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #app-content h1 {
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        #app-content p {
+            color: #8892b0;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        /* Botón solo para resetear el testeo del intro */
+        .reset-btn {
+            margin-top: 30px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: var(--accent-glow);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Capa del Intro -->
+    <div id="intro-overlay">
+        <!-- Contenedor de Marca de Agua -->
+        <div class="watermark-container" id="watermark-container">
+            <!-- Se llena con JavaScript -->
+        </div>
+
+        <div class="intro-content">
+            <!-- Imagotipo -->
+            <!-- Usamos un SVG elegante abstracto simulando una gema o forma contable/digital -->
+            <svg class="imagotype" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 10 L85 30 L85 70 L50 90 L15 70 L15 30 Z" stroke="var(--accent-color)" stroke-width="2.5"
+                    stroke-linejoin="round" />
+                <path d="M50 10 L50 50 M85 30 L50 50 M15 30 L50 50 M85 70 L50 50 M15 70 L50 50 M50 90 L50 50"
+                    stroke="var(--accent-color)" stroke-width="1" stroke-opacity="0.5" />
+                <circle cx="50" cy="50" r="8" fill="var(--accent-color)" filter="blur(2px)" />
+                <circle cx="50" cy="50" r="4" fill="#ffffff" />
+            </svg>
+
+            <!-- Contenedor del Logo -->
+            <div class="logo-container" id="logo-container">
+                <!-- Spans inyectados con JavaScript -->
+            </div>
+        </div>
+
+        <div class="call-to-action">Toca o presiona Enter para continuar</div>
+    </div>
+
+    <!-- Contenedor de la Aplicación Principal -->
+    <div id="app-content">
+        <h1>Presupuesto Combinado</h1>
+        <p>Has entrado a la aplicación. Si recargas la página (F5 o Cmd+R), el intro no volverá a aparecer en esta
+            sesión gracias al sessionStorage.</p>
+        <button class="reset-btn" onclick="sessionStorage.removeItem('introSeen'); location.reload();">Reiniciar Intro
+            para probar</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const introOverlay = document.getElementById('intro-overlay');
+            const watermarkContainer = document.getElementById('watermark-container');
+            const logoContainer = document.getElementById('logo-container');
+
+            // 1. Verificar sessionStorage
+            // 'introSeen' determina si ya se vio en esta pestaña/sesión
+            const isIntroSeen = sessionStorage.getItem('introSeen');
+
+            if (isIntroSeen === 'true') {
+                // Si ya se vio, se oculta instantáneamente
+                introOverlay.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Permitir scroll en la app
+                return; // Detener la ejecución del resto del script del intro
+            }
+
+            // 2. Preparar los datos del intro (Marcas de agua desde JSON)
+            let phrases = [];
+            try {
+                // Hacemos la petición al archivo JSON local
+                const response = await fetch('frases.json');
+                phrases = await response.json();
+            } catch (error) {
+                console.error("Error al cargar el archivo JSON:", error);
+                // Frase de respaldo por si falla la carga
+                phrases = [
+                    "Gestión inteligente",
+                    "Control financiero",
+                    "Finanzas compartidas",
+                    "Planifica tu futuro",
+                    "El valor de tu dinero",
+                    "Tranquilidad económica",
+                    "Tu dinero en orden"
+                ];
+            }
+
+            // Seleccionar frase aleatoria
+            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            const watermarkText = `Oola - ${randomPhrase.toUpperCase()}    `;
+
+            // Llenar el contenedor de la marca de agua
+            let watermarkHTML = '';
+            // Creamos 40 filas (rows) que funcionarán como los anillos del criptex
+            for (let r = 0; r < 40; r++) {
+                watermarkHTML += `<div class="watermark-row">`;
+                // Cada fila tiene suficientes repeticiones para que no se acorte al deslizarse
+                for (let i = 0; i < 30; i++) {
+                    watermarkHTML += `<span class="watermark-text">${watermarkText}</span>`;
+                }
+                watermarkHTML += `</div>`;
+            }
+            watermarkContainer.innerHTML = watermarkHTML;
+
+            // 3. Preparar Animación del Logo "Oola"
+            const logoText = "Oola";
+            let logoHTML = '';
+
+            // Generar delays aleatorios pero asegurando que no se repitan los mismos tiempos
+            const baseDelays = [];
+            for (let i = 0; i < logoText.length; i++) {
+                // Delays entre 0.4s y 1.6s
+                baseDelays.push((Math.random() * 1.2 + 0.4).toFixed(2));
+            }
+
+            // Si quieres asegurarte de que ninguno empiece exactamente al mismo tiempo, 
+            // el Math.random() ya lo hace casi imposible con 2 decimales.
+
+            for (let i = 0; i < logoText.length; i++) {
+                const char = logoText[i];
+                // Resaltar la primera letra (opcional, acorde a "toques brillantes")
+                const extraClass = (i === 0) ? 'highlight' : '';
+                logoHTML += `<span class="logo-letter ${extraClass}" style="animation-delay: ${baseDelays[i]}s">${char}</span>`;
+            }
+            logoContainer.innerHTML = logoHTML;
+
+            // 4. Lógica para quitar el intro
+            let isDismissing = false;
+            const dismissIntro = () => {
+                if (isDismissing) return;
+                isDismissing = true;
+
+                // Transición de salida
+                introOverlay.classList.add('hidden');
+                document.body.style.overflow = 'auto'; // Restaurar scroll
+
+                // Guardar en sessionStorage para no volver a mostrar en esta pestaña
+                sessionStorage.setItem('introSeen', 'true');
+
+                // Eliminar completamente del DOM después de que termine la transición en CSS
+                setTimeout(() => {
+                    if (introOverlay.parentNode) {
+                        introOverlay.parentNode.removeChild(introOverlay);
+                    }
+                }, 800);
+            };
+
+            // Event Listeners para cerrar el intro
+            introOverlay.addEventListener('click', dismissIntro);
+
+            // Para dispositivos touch
+            document.addEventListener('touchstart', (e) => {
+                if (introOverlay && introOverlay.contains(e.target)) {
+                    dismissIntro();
+                }
+            }, { passive: false });
+
+            // Para teclado (Enter o Espacio)
+            document.addEventListener('keydown', (e) => {
+                // Solo si el intro sigue visible
+                if (!introOverlay.classList.contains('hidden')) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        dismissIntro();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
